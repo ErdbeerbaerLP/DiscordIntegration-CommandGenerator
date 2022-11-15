@@ -1,176 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Discord Integration command generator</title>
-</head>
-<body>
-<h2>Discord Integration command generator ᴮᴱᵀᴬ</h2>
-<br>
-<h3>How to use?</h3>
-Just enter the details correctly and hit the "Generate" button to get the config entry.<br>
-All inputs are required (but adding arguments is optional)
-<br><br>
-To get more help about an option, hover over the text field, button or checkbox
-<br><br><br>
-<h3>Command generator</h3>
-<h4>Base command</h4>
-<form id="inputform" action="javascript:generateCmd();">
-    <label for="cmdname">Command name:</label>
-    <input type="text" id="cmdname" maxlength="32" size="30" title="Name of your command. Must be alphanumeric and lowercase and up to 32 characters" placeholder="mycommand"><br>
-    <label for="cmddesc">Command description:</label>
-    <input type="text" id="cmddesc" maxlength="100" size="50" title="Description of your command. Up to 100 characters." placeholder="My custom command"><br>
-    <label for="mccmd">Minecraft Command:</label>
-    <input type="text" id="mccmd" size="40" title="Minecrat Command to execute. To add arguments defined below, add the argument name surrounded by % signs (example: %arg%)" placeholder="ban %player% %reason%"><br>
-    <label for="adminOnly">Admin Only?</label>
-    <input type="checkbox" id="adminOnly" checked title="Check to require having one of the configured Admin-Role IDs"><br><br><br>
-    <div id="args">
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js"></script>
+  </head>
+
+  <body>
+    <h2>Discord Integration command generator ᴮᴱᵀᴬ</h2>
+
+    <h3>How to use?</h3>
+    Just enter the details correctly and hit the "Generate" button to get the
+    config entry. All inputs are required (but adding arguments is optional) To
+    get more help about an option, hover over the text field, button or checkbox
+
+    <h3>Command generator</h3>
+    <h4>Base command</h4>
+    <form id="inputform" action="javascript:generateCmd();">
+      <div class="input">
+        <label for="cmdname">Command name:</label>
+        <input
+          type="text"
+          id="cmdname"
+          maxlength="32"
+          size="30"
+          title="Name of your command. Must be alphanumeric and lowercase and up to 32 characters"
+          placeholder="mycommand"
+        />
+      </div>
+      <div class="input">
+        <label for="cmddesc">Command description:</label>
+        <input
+          type="text"
+          id="cmddesc"
+          size="50"
+          title="Description of your command. Up to 100 characters."
+          placeholder="My custom command"
+        />
+      </div>
+      <div class="input">
+        <label for="mccmd">Minecraft Command:</label>
+        <input
+          type="text"
+          id="mccmd"
+          size="40"
+          title="Minecrat Command to execute. To add arguments defined below, add the argument name surrounded by % signs (example: %arg%)"
+          placeholder="ban %player% %reason%"
+        />
+      </div>
+      <div class="input-check">
+        <label for="adminOnly">Admin Only?</label>
+        <input
+          type="checkbox"
+          id="adminOnly"
+          checked
+          title="Check to require having one of the configured Admin-Role IDs"
+        />
+      </div>
+      <div id="args"></div>
+      <br />
+      <div class="buttons">
+        <button
+          type="button"
+          id="addargbtn"
+          onclick="addArg()"
+          title="Add an custom argument. Up to 25 arguments are supported"
+        >
+          + Add Argument
+        </button>
+        <button
+          type="button"
+          id="delargbtn"
+          onclick="delArg()"
+          disabled
+          title="Removes the last custom argument"
+        >
+          - Remove Argument
+        </button>
+
+        <input
+          id="generatebtn"
+          type="submit"
+          value="Generate"
+          title="Generates the config entry into the text box below"
+        />
+      </div>
+    </form>
+    Make sure you filled everything in correctly, this generator does not check
+    for errors!
+
+    <label for="output">Generated Output</label>
+    <pre id="output" readonly rows="20" cols="100" onclick="copy();">
+      Config argument will be generated here
+    </pre>
+
+    <div class="footer">
+      Source Code available on
+      <a
+        href="https://github.com/ErdbeerbaerLP/DiscordIntegration-CommandGenerator"
+        >GitHub</a
+      >
     </div>
-    <br>
-    <button type="button" id="addargbtn" onclick="addArg()" title="Add an custom argument. Up to 25 arguments are supported">+ Add Argument</button>
-    <button type="button" id="delargbtn" onclick="delArg()" disabled title="Removes the last custom argument">- Remove Argument</button>
-    <br><br><br>
-    <input type="submit" value="Generate" title="Generates the config entry into the text box below">
-</form>
-Make sure you filled everything in correctly, this generator does not check for errors!
-<br><br>
-<label for="output">Generated Output</label><br>
-<textarea id="output" onClick="this.select();" readonly rows="20" cols="100">
-Config argument will be generated here
-</textarea>
-Source Code available on <a href="https://github.com/ErdbeerbaerLP/DiscordIntegration-CommandGenerator">GitHub</a>
-<script>
-    let argcount = 0;
-
-    function generateCmd() {
-
-        function escapeStr(str){
-            return str.replaceAll("\"", "\\\"")
-        }
-
-        var outp = document.getElementById("output");
-        var out = "    [[commands.customCommands]]\n";
-        out += "      name = \"" + escapeStr(document.getElementById("cmdname").value).toLowerCase().replaceAll(" ", "") + "\"\n"
-        out += "      description = \"" + escapeStr(document.getElementById("cmddesc").value) + "\"\n"
-        let mccmd = document.getElementById("mccmd").value;
-        if (mccmd.startsWith("/")) mccmd = mccmd.substr(1)
-        out += "      mcCommand = \"" + escapeStr(mccmd) + "\"\n"
-        out += "      adminOnly = "+ document.getElementById("adminOnly").checked+"\n";
-        out += "\n"
-        function getElementByID(tags, id){
-            let tag = {};
-            for (let i = 0; i < tags.length; i++) {
-                if (tags[i].id === id) {
-                    tag = tags[i];
-                    break;
-                }
-            }
-            return tag;
-        }
-        const tags = document.getElementById("args").getElementsByTagName("div");
-        for(let i = 0; i< tags.length; i++) {
-            const inputs = tags[i].getElementsByTagName("input")
-            out += "        [[commands.customCommands.args]]\n";
-            out += "          name = \""+escapeStr(getElementByID(inputs,"argName").value).toLowerCase()+"\"\n";
-            out += "          description = \""+escapeStr(getElementByID(inputs,"argDesc").value)+"\"\n";
-            out += "          optional = "+getElementByID(inputs,"argOptional").checked+"\n";
-            out += "\n"
-        }
-
-
-        outp.textContent = out;
-    }
-
-    function delArg() {
-        const tags = document.getElementById("args").getElementsByTagName("div");
-        for(let i = 0; i< tags.length; i++) {
-            if(tags[i].id === "arg" + argcount)
-                tags[i].parentElement.removeChild(tags[i])
-        }
-        argcount--;
-        if (argcount === 0)
-            document.getElementById("delargbtn").disabled = true;
-        if (argcount < 25)
-            document.getElementById("addargbtn").disabled = false;
-
-    }
-
-    function addArg() {
-
-        //Counting and Button logic
-        argcount++;
-        document.getElementById("delargbtn").disabled = false;
-        if (argcount >= 25)
-            document.getElementById("addargbtn").disabled = true;
-
-        //Argument container
-
-        const argDiv = document.createElement("div");
-        argDiv.setAttribute("id", "arg" + argcount)
-
-        //Argument header
-
-        const h4 = document.createElement("h4");
-        h4.innerHTML = "Command argument #" + argcount;
-        argDiv.append(h4)
-
-        //Argument name
-
-        const argNameLabel = document.createElement("label");
-        argNameLabel.setAttribute("for", "argName")
-        argNameLabel.innerHTML = "Argument Name: "
-        const argName = document.createElement("input");
-        argName.setAttribute("id", "argName");
-        argName.setAttribute("type", "text");
-        argName.setAttribute("placeholder", "arg");
-        argName.setAttribute("title", "Name of your argument. Must be alphanumeric and lowercase. Up to 32 characters.");
-        argName.setAttribute("maxlength", "32");
-        argName.setAttribute("size", "30");
-        argDiv.append(argNameLabel)
-        argDiv.append(argName)
-        argDiv.append(document.createElement("br"))
-
-        // Argument Description
-
-        const argDescLabel = document.createElement("label");
-        argDescLabel.setAttribute("for", "argDesc")
-        argDescLabel.innerHTML = "Argument Description: "
-        const argDesc = document.createElement("input");
-        argDesc.setAttribute("id", "argDesc");
-        argDesc.setAttribute("type", "text");
-        argDesc.setAttribute("placeholder", "My cool command argument");
-        argDesc.setAttribute("title", "Description of your argument. Up to 100 characters.");
-        argDesc.setAttribute("maxlength", "100");
-        argDesc.setAttribute("size", "50");
-        argDiv.append(argDescLabel)
-        argDiv.append(argDesc)
-        argDiv.append(document.createElement("br"))
-
-        //Optional command?
-
-        const argOptionalLabel = document.createElement("label");
-        argOptionalLabel.setAttribute("for", "argOptional")
-        argOptionalLabel.innerHTML = "Optional? "
-        const argOptional = document.createElement("input");
-        argOptional.setAttribute("id", "argOptional");
-        argOptional.setAttribute("type", "checkbox");
-        argOptional.setAttribute("placeholder", "argument");
-        argOptional.setAttribute("title", "Check if this argument should be optional, uncheck to require setting this argument");
-        argOptional.checked = true
-        argDiv.append(argOptionalLabel)
-        argDiv.append(argOptional)
-        argDiv.append(document.createElement("br"))
-
-        //Newlines
-
-        argDiv.append(document.createElement("br"))
-        argDiv.append(document.createElement("br"))
-
-        // Add container to arguments
-
-        document.getElementById("args").append(argDiv)
-    }
-
-</script>
-</body>
+  </body>
 </html>
